@@ -1,0 +1,13 @@
+# Pasta de build e arquivos de dependência
+[Bb]in/
+[Oo]bj/
+
+# Arquivos de configuração de usuário e de IDE
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Outros
+*.DS_Store
