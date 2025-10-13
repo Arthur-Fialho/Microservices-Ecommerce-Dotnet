@@ -11,3 +11,7 @@
 
 # Outros
 *.DS_Store
+
+# Arquivos de configuração específicos do Estoque.API
+**/appsettings.json
+**/appsettings.Development.json
