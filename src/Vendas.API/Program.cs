@@ -1,18 +1,25 @@
-using Microsoft.AspNetCore.Builder;
 using Vendas.Domain;
 using Vendas.Infrastructure;
-using Swashbuckle.AspNetCore.SwaggerUI;
+using Microsoft.EntityFrameworkCore;
+using Vendas.Application;
+using Vendas.Application.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Adicionar o serviço do HttpClient tipado
+// Configuração do DbContext de Vendas
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<VendasDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+// Configuração do HttpClient para o serviço de Estoque
 builder.Services.AddHttpClient<IEstoqueServiceHttpClient, EstoqueServiceHttpClient>(client =>
 {
-    // A URL base do microserviço de Estoque.
     client.BaseAddress = new Uri(builder.Configuration["ServicesUrl:EstoqueApi"]);
 });
 
-// Add services to the container.
+// Registro das dependências (Interface -> Implementação)
+builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
+builder.Services.AddScoped<IPedidoService, PedidoService>();
 
 builder.Services.AddControllers();
 

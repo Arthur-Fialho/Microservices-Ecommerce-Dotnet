@@ -3,7 +3,7 @@ using Vendas.Domain;
 
 namespace Vendas.Infrastructure
 {
-    public class PedidoRepository
+    public class PedidoRepository : IPedidoRepository
     {
         private readonly VendasDbContext _context;
 
