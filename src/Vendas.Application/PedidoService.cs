@@ -7,11 +7,13 @@ namespace Vendas.Application
     {
     private readonly IPedidoRepository _pedidoRepository;
     private readonly IEstoqueServiceHttpClient _estoqueService;
+    private readonly IMessagePublisher _messagePublisher;
 
-    public PedidoService(IPedidoRepository pedidoRepository, IEstoqueServiceHttpClient estoqueService)
+    public PedidoService(IPedidoRepository pedidoRepository, IEstoqueServiceHttpClient estoqueService, IMessagePublisher messagePublisher)
     {
         _pedidoRepository = pedidoRepository;
         _estoqueService = estoqueService;
+        _messagePublisher = messagePublisher;
     }
 
     public async Task<bool> CriarPedidoAsync(CriarPedidoDto criarPedidoDto)
@@ -22,10 +24,12 @@ namespace Vendas.Application
         {
             // 1. VALIDAÇÃO: Chama o microserviço de Estoque
             var produtoDto = await _estoqueService.GetProdutoByIdAsync(itemDto.ProdutoId);
-
-            // Regras de negócio
-            if (produtoDto == null) return false; // Produto não existe
-            if (produtoDto.QuantidadeEmEstoque < itemDto.Quantidade) return false; // Estoque insuficiente
+            
+            // Verifica se o produto é nulo ANTES de tentar usar suas propriedades.
+            if (produtoDto == null || produtoDto.QuantidadeEmEstoque < itemDto.Quantidade)
+            {
+                return false; // Produto não existe ou estoque insuficiente
+            }
 
             // 2. CRIAÇÃO: Adiciona o item ao pedido
             var itemPedido = new ItemPedido(produtoDto.Id, itemDto.Quantidade, produtoDto.Preco);
@@ -35,8 +39,19 @@ namespace Vendas.Application
         // 3. PERSISTÊNCIA: Salva o novo pedido no banco de dados de Vendas
         await _pedidoRepository.AddAsync(novoPedido);
 
-        // TODO: Notificar o serviço de estoque para dar baixa.
+        // 4. PUBLICAÇÃO: Notifica outros serviços que um pedido foi criado.
+        var evento = new PedidoCriadoEvent
+        {
+            PedidoId = novoPedido.Id,
+            Itens = novoPedido.Itens.Select(item => new PedidoCriadoItem
+            {
+                ProdutoId = item.ProdutoId,
+                Quantidade = item.Quantidade
+            }).ToList()
+        };
+        _messagePublisher.Publish(evento); // Dispara a mensagem e não espera por resposta!
 
+        
         return true;
     }
 

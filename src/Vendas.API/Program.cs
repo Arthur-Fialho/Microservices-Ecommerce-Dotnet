@@ -20,6 +20,7 @@ builder.Services.AddHttpClient<IEstoqueServiceHttpClient, EstoqueServiceHttpClie
 // Registro das dependências (Interface -> Implementação)
 builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 builder.Services.AddScoped<IPedidoService, PedidoService>();
+builder.Services.AddSingleton<IMessagePublisher, RabbitMQPublisher>();
 
 builder.Services.AddControllers();
 
