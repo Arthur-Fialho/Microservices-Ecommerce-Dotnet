@@ -13,7 +13,7 @@ builder.Services.AddDbContext<EstoqueDbContext>(options =>
 // Configuração de injeção de dependência
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 builder.Services.AddScoped<IProdutoService, ProdutoService>();
-
+builder.Services.AddHostedService<RabbitMQConsumer>();
 
 // Add services to the container.
 builder.Services.AddControllers();
