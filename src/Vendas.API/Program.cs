@@ -44,6 +44,7 @@ builder.Services.AddHttpClient<IEstoqueServiceHttpClient, EstoqueServiceHttpClie
 builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 builder.Services.AddScoped<IPedidoService, PedidoService>();
 builder.Services.AddSingleton<IMessagePublisher, RabbitMQPublisher>();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
 
