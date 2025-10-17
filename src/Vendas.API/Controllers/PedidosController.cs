@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Vendas.Application;
 using Vendas.Application.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class PedidosController : ControllerBase
 {
     private readonly IPedidoService _pedidoService;

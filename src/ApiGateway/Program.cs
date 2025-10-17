@@ -4,9 +4,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
 // 2. Registra o pipeline do YARP que irá lidar com o roteamento
 app.MapReverseProxy();
+
+app.MapControllers();
 
 app.Run();
